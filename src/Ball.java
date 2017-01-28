@@ -1,11 +1,16 @@
 public class Ball {
-    public static float size = 20; // Radius of the ball
+    //Radius of the ball
+    public static float size = 20;
+    //Speed (vertical pixels per tick) of the ball
     public static float speed = 2;
-    public static int maxDx = 5; //Max horizontal movement the ball can get
+    //Max horizontal movement the ball can get
+    public static int maxDx = 5;
 
     private float x;
     private float y;
     private float dx = 0;
+
+    //Direction of the ball (-1 or 1)
     private float direction = 1;
 
     public Ball(float x, float y) {

@@ -66,10 +66,10 @@ public class PongServer extends PApplet {
                         float paddleX = Float.parseFloat(commands[1]);
                         if (client == client1) {
                             client2.write(message);
-                            paddle1.setPaddleX(paddleX);
+                            paddle1.setX(paddleX);
                         } else if (client == client2) {
                             client1.write(message);
-                            paddle2.setPaddleX(paddleX);
+                            paddle2.setX(paddleX);
                         } else {
                             println("ERROR: GOT MESSAGE FROM UNKNOWN CLIENT");
                         }
@@ -78,11 +78,13 @@ public class PongServer extends PApplet {
             }
         }
 
+        //If the game has started, process a game tick
         if (gameStarted) {
             int updateFromServer = PongLogic.processTick(ball, paddle1, paddle2, true, 0);
             tick++;
+            //If the ball bounced on a paddle or left the screen, send a game update to the clients
             if (updateFromServer != 0) {
-                s.write("[" + paddle1.getPaddleX() + "," + paddle2.getPaddleX() + "," + ball.getX() + "," + ball.getY() + "," + ball.getDirection() + "," + ball.getDx() + "," + tick + "]");
+                s.write("[" + paddle1.getX() + "," + paddle2.getX() + "," + ball.getX() + "," + ball.getY() + "," + ball.getDirection() + "," + ball.getDx() + "," + tick + "]");
             }
         }
 
@@ -92,7 +94,7 @@ public class PongServer extends PApplet {
 
         //Draw paddles
         fill(153);
-        rect(paddle1.getPaddleX(), paddle1.getWallDistance(), paddle1.getPaddleWidth(), paddle1.getPaddleHeight());
-        rect(paddle2.getPaddleX(), height - paddle2.getWallDistance(), paddle2.getPaddleWidth(), paddle2.getPaddleHeight());
+        rect(paddle1.getX(), paddle1.getWallDistance(), paddle1.getPaddleWidth(), paddle1.getPaddleHeight());
+        rect(paddle2.getX(), height - paddle2.getWallDistance(), paddle2.getPaddleWidth(), paddle2.getPaddleHeight());
     }
 }

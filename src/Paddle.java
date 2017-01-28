@@ -1,45 +1,52 @@
 public class Paddle {
-    public static int paddleWidth = 80;
-    public static int paddleHeight = 20;
+    public static int width = 80;
+    public static int height = 20;
+
+    //Distance between wall and paddle center
     public static int wallDistance = 15;
-    public static float paddleSpeed = 10;
 
-    private float paddleX;
-    private float paddleDir = 0;
+    //Speed (pixels per tick) of the paddle
+    public static float speed = 10;
 
-    public Paddle(int paddleX) {
-        this.paddleX = paddleX;
+    //X coordinate of paddle
+    private float x;
+
+    //Direction of paddle (-1, 0 or 1)
+    private float direction = 0;
+
+    public Paddle(int x) {
+        this.x = x;
     }
 
-    public void setPaddleX(float paddleX) {
-        this.paddleX = paddleX;
+    public void setX(float x) {
+        this.x = x;
     }
 
-    public void setPaddleDir(float paddleDir) {
-        this.paddleDir = paddleDir;
+    public void setDirection(float direction) {
+        this.direction = direction;
     }
 
     public int getPaddleWidth() {
-        return paddleWidth;
+        return width;
     }
 
     public int getPaddleHeight() {
-        return paddleHeight;
+        return height;
     }
 
     public int getWallDistance() {
         return wallDistance;
     }
 
-    public float getPaddleX() {
-        return paddleX;
+    public float getX() {
+        return x;
     }
 
     public float getPaddleSpeed() {
-        return paddleSpeed;
+        return speed;
     }
 
-    public float getPaddleDir() {
-        return paddleDir;
+    public float getDirection() {
+        return direction;
     }
 }
