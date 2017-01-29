@@ -35,7 +35,7 @@ public class Pong extends PApplet {
         rectMode(CENTER);
         ellipseMode(CENTER);
         c = new Client(this, "127.0.0.1", 12345); // Connect to local server
-        c.write("Hey server, how you doin'? ;)");
+        c.write("[0]");
     }
 
     public void draw() {
@@ -52,7 +52,7 @@ public class Pong extends PApplet {
                 if (commands != null) {
                     if (!gameStarted) {
                         //If the game has not yet started, start it now
-                        playerId = Integer.parseInt(commands[0]);
+                        playerId = Integer.parseInt(commands[1]);
                         gameStarted = true;
                         println("Received game start message, player id: " + playerId);
                         //Set the player and opponent paddle references for easy access
@@ -64,26 +64,34 @@ public class Pong extends PApplet {
                             opponentPaddle = paddle1;
                         }
                     } else {
-                        if (commands.length == 2) {
-                            //If just a simple packet with info from other paddle, process that
-                            try {
-                                int tick = Integer.parseInt(commands[0]);
-                            } catch (NumberFormatException e) {
-                                System.out.println("WARNING: Could not read message: " + message);
-                            }
-                            float paddleX = Float.parseFloat(commands[1]);
-                            opponentPaddle.setX(paddleX);
-                        } else {
-                            //Otherwise it's a packet containing the full game state, process that then
-                            if (playerId == 1) {
-                                paddle2.setX(Float.parseFloat(commands[1]));
-                            } else {
-                                paddle1.setX(Float.parseFloat(commands[0]));
-                            }
-                            ball.setX(Float.parseFloat(commands[2]));
-                            ball.setY(Float.parseFloat(commands[3]));
-                            ball.setDirection(Float.parseFloat(commands[4]));
-                            ball.setDx(Float.parseFloat(commands[5]));
+                        switch (Integer.parseInt(commands[0])) {
+                            case 1:
+                                //If just a simple packet with info from other paddle, process that
+                                float paddleX = Float.parseFloat(commands[1]);
+                                opponentPaddle.setX(paddleX);
+                                break;
+                            case 2:
+                                //Otherwise it's a packet containing the full game state, process that then
+                                if (playerId == 1) {
+                                    paddle2.setX(Float.parseFloat(commands[2]));
+                                } else {
+                                    paddle1.setX(Float.parseFloat(commands[1]));
+                                }
+                                ball.setX(Float.parseFloat(commands[3]));
+                                ball.setY(Float.parseFloat(commands[4]));
+                                ball.setDirection(Float.parseFloat(commands[5]));
+                                ball.setDx(Float.parseFloat(commands[6]));
+                                break;
+                            case 3:
+                                //If it's a reset game packet, reset the game
+                                ball.setX(width / 2);
+                                ball.setY(height / 2);
+                                ball.setDirection(Float.parseFloat(commands[1]));
+                                ball.setDx(Float.parseFloat(commands[2]));
+                                paddle1.setX(width / 2);
+                                paddle2.setX(width / 2);
+                                score.resetScore();
+                                break;
                         }
                     }
                 }
@@ -102,7 +110,7 @@ public class Pong extends PApplet {
                 makeSound(2);
             }
 
-            c.write("[" + tick + "," + +playerPaddle.getX() + "]");
+            c.write("[1," + playerPaddle.getX() + "]");
         }
 
         PongLogic.drawScreen(this, ball, paddle1, paddle2, score);
@@ -114,6 +122,8 @@ public class Pong extends PApplet {
             playerPaddle.setDirection(-1);
         } else if (key == 'd') {
             playerPaddle.setDirection(1);
+        } else if (key == 'r') {
+            voteResetGame();
         }
     }
 
@@ -131,6 +141,10 @@ public class Pong extends PApplet {
      */
     private void makeSound(int pitch) {
         //TODO Implement this
+    }
+
+    private void voteResetGame() {
+        c.write("[3]");
     }
 }
 

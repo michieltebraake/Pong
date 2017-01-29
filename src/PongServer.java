@@ -2,6 +2,8 @@ import processing.core.PApplet;
 import processing.net.Client;
 import processing.net.Server;
 
+import java.util.Random;
+
 public class PongServer extends PApplet {
     private int width = 500;
     private int height = 400;
@@ -9,6 +11,9 @@ public class PongServer extends PApplet {
     private Server s;
     private Client client1;
     private Client client2;
+
+    private long client1ResetVote = 0;
+    private long client2ResetVote = 0;
 
     private Buffer buffer = new Buffer();
 
@@ -43,7 +48,6 @@ public class PongServer extends PApplet {
         if (client != null) {
             String message = client.readString();
             if (message != null) {
-                System.out.println(message);
                 //If game has not yet started, accept client connection
                 if (!gameStarted) {
                     if (client1 == null) {
@@ -53,26 +57,46 @@ public class PongServer extends PApplet {
                         println("Client 2 connected, starting game");
                         client2 = client;
                         //Both clients are connected, start match!
-                        client1.write("[1]");
-                        client2.write("[2]");
+                        client1.write("[1,1]");
+                        client2.write("[1,2]");
                         gameStarted = true;
                     }
                 } else {
                     //If game has started, relay the message to the other client
                     //Override buffer, since server doesn't care about missing messages
-                    buffer.setBuffer(message);
-                    PongLogic.decodePacket(buffer);
-                    String[] commands = buffer.getLatestCommand();
-                    if (commands != null) {
-                        float paddleX = Float.parseFloat(commands[1]);
-                        if (client == client1) {
-                            client2.write(message);
-                            paddle1.setX(paddleX);
-                        } else if (client == client2) {
-                            client1.write(message);
-                            paddle2.setX(paddleX);
-                        } else {
-                            println("ERROR: GOT MESSAGE FROM UNKNOWN CLIENT");
+                    buffer.appendBuffer(message);
+                    while (PongLogic.containsPacket(buffer)) {
+                        PongLogic.decodePacket(buffer);
+                        String[] commands = buffer.getLatestCommand();
+                        if (commands != null) {
+                            switch (Integer.parseInt(commands[0])) {
+                                case 1:
+                                    float paddleX = Float.parseFloat(commands[1]);
+                                    if (client == client1) {
+                                        client2.write(message);
+                                        paddle1.setX(paddleX);
+                                    } else if (client == client2) {
+                                        client1.write(message);
+                                        paddle2.setX(paddleX);
+                                    } else {
+                                        println("ERROR: GOT MESSAGE FROM UNKNOWN CLIENT");
+                                    }
+                                    break;
+                                case 3:
+                                    if (client == client1) {
+                                        client1ResetVote = System.currentTimeMillis();
+                                    } else if (client == client2) {
+                                        client2ResetVote = System.currentTimeMillis();
+                                    }
+                                    if (Math.abs(client1ResetVote - client2ResetVote) < 1000) {
+                                        int direction = Math.random() < 0.5 ? -1 : 1;
+                                        int dx = new Random().nextInt(2 * Ball.maxDx) - Ball.maxDx;
+                                        System.out.println("Sending game reset packet");
+                                        s.write("[3," + direction + "," + dx + "]");
+                                    }
+                                    break;
+                            }
+
                         }
                     }
                 }
@@ -85,7 +109,7 @@ public class PongServer extends PApplet {
             tick++;
             //If the ball bounced on a paddle or left the screen, send a game update to the clients
             if (updateFromServer != 0) {
-                s.write("[" + paddle1.getX() + "," + paddle2.getX() + "," + ball.getX() + "," + ball.getY() + "," + ball.getDirection() + "," + ball.getDx() + "," + tick + "]");
+                s.write("[2," + paddle1.getX() + "," + paddle2.getX() + "," + ball.getX() + "," + ball.getY() + "," + ball.getDirection() + "," + ball.getDx() + "," + tick + "]");
             }
         }
 

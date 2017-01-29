@@ -9,6 +9,11 @@ public class Score {
 
     }
 
+    public void resetScore() {
+        player1Score = 0;
+        player2Score = 0;
+    }
+
     public int addPoint(int playerId) {
         if (playerId == 1) {
             player1Score++;
