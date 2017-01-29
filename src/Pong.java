@@ -1,11 +1,17 @@
 import processing.core.PApplet;
 import processing.net.Client;
+import processing.serial.Serial;
 
 public class Pong extends PApplet {
     public static int width = 500;
     public static int height = 400;
 
+    private static int NEWLINE_N = 10;
+    private static int NEWLINE_R = 13;
+    private String serialBuffer;
+
     private Client c;
+    private Serial port;
     private Buffer buffer = new Buffer();
     private int tick = 0;
 
@@ -32,6 +38,11 @@ public class Pong extends PApplet {
     }
 
     public void setup() {
+        try {
+            port = new Serial(this, Serial.list()[0], 9600);
+        } catch (RuntimeException e) {
+            System.out.println("Serial port was busy, only keyboard input available");
+        }
         rectMode(CENTER);
         ellipseMode(CENTER);
         c = new Client(this, "127.0.0.1", 12345); // Connect to local server
@@ -40,6 +51,13 @@ public class Pong extends PApplet {
 
     public void draw() {
         background(0);
+
+        if (port != null) {
+            //Read serial input
+            while (port.available() > 0) {
+                serialEvent(port.read()); // read data
+            }
+        }
 
         while (c.available() > 0) {
             String message = c.readString();
@@ -106,6 +124,30 @@ public class Pong extends PApplet {
         }
 
         PongLogic.drawScreen(this, ball, paddle1, paddle2, score);
+    }
+
+    private void serialEvent(int serial) {
+        try { // try-catch because of transmission errors
+            if (serial != NEWLINE_R && serial != NEWLINE_N) {
+                serialBuffer += (char) serial;
+            } else {
+                switch (serialBuffer) {
+                    case "L":
+                        System.out.println("Pressed left");
+                        playerPaddle.setDirection(-1);
+                        break;
+                    case "R":
+                        playerPaddle.setDirection(1);
+                        break;
+                    case "NONE":
+                        playerPaddle.setDirection(0);
+                        break;
+                }
+                serialBuffer = ""; // Clear the value of "serialBuffer"
+            }
+        } catch (Exception e) {
+            println("no valid data");
+        }
     }
 
     public void keyPressed() {
