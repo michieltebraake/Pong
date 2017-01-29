@@ -82,7 +82,6 @@ public class Pong extends PApplet {
                             ball.setY(Float.parseFloat(commands[3]));
                             ball.setDirection(Float.parseFloat(commands[4]));
                             ball.setDx(Float.parseFloat(commands[5]));
-                            System.out.println("Update from server applied to game state");
                         }
                     }
                 }
@@ -92,6 +91,14 @@ public class Pong extends PApplet {
         //If the game has started, process a game tick
         if (gameStarted) {
             int status = PongLogic.processTick(ball, paddle1, paddle2, false, playerId);
+
+            if (status == 1) {
+                //Make a sound that indicates bouncing on a paddle
+                makeSound(1);
+            } else if (status == 2) {
+                //Make a sound that indicates that the ball went off the screen
+                makeSound(2);
+            }
 
             c.write("[" + tick + "," + +playerPaddle.getX() + "]");
         }
@@ -120,6 +127,15 @@ public class Pong extends PApplet {
         if (key == 'a' || key == 'd') {
             playerPaddle.setDirection(0);
         }
+    }
+
+    /**
+     * Sends a signal to the Arduino which will then make a sound with it's speaker
+     *
+     * @param pitch Pitch of the sound
+     */
+    private void makeSound(int pitch) {
+        //TODO Implement this
     }
 }
 

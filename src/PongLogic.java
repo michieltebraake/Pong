@@ -8,7 +8,7 @@ public class PongLogic {
      * Moving the paddles
      * Testing for collisions and bouncing the ball if a collision is found
      * Resetting the ball when it goes off screen (when a point is scored)
-     * This method returns a status code, where 0 = nothing, 1 = ball bounced on wall, 2 = ball bounced on paddle
+     * This method returns a status code, where 0 = nothing, 1 = ball bounced on paddle, 2 = ball went off screen
      *
      * @param ball the game ball
      * @param paddle1 the top paddle
