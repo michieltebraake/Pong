@@ -1,3 +1,5 @@
+import processing.core.PApplet;
+
 import java.util.Random;
 
 public class PongLogic {
@@ -8,16 +10,16 @@ public class PongLogic {
      * Moving the paddles
      * Testing for collisions and bouncing the ball if a collision is found
      * Resetting the ball when it goes off screen (when a point is scored)
-     * This method returns a status code, where 0 = nothing, 1 = ball bounced on paddle, 2 = ball went off screen
+     * This method returns a status code, where 0 = nothing, 1 = ball bounced on paddle, 2 = player 1 scored, 3 = player 2 scored
      *
-     * @param ball the game ball
-     * @param paddle1 the top paddle
-     * @param paddle2 the bottom paddle
-     * @param server indicates if method is being called from the server
+     * @param ball         the game ball
+     * @param paddle1      the top paddle
+     * @param paddle2      the bottom paddle
+     * @param server       indicates if method is being called from the server
      * @param paddleToMove id of the paddle that needs to be moved
      * @return int status
      */
-    public static int processTick(Ball ball, Paddle paddle1, Paddle paddle2, boolean server, int paddleToMove) {
+    public static int processTick(Ball ball, Paddle paddle1, Paddle paddle2, Score score, boolean server, int paddleToMove) {
         //Whenever the ball is hit by a paddle or goes off screen, the game state is sent to the client from the server
         //This is done to prevent the clients from becoming desynchronized
         int updateFromServer = 0;
@@ -90,7 +92,8 @@ public class PongLogic {
                 ball.setDx(new Random().nextInt(2 * Ball.maxDx) - Ball.maxDx);
             }
             //Indicate that a game update needs to be sent to synchronize the new ball angle
-            updateFromServer = 2;
+            updateFromServer = (ball.getDirection() == 1) ? 2 : 3;
+            score.addPoint(ball.getDirection() == 1 ? 1 : 2);
         }
 
         //If the ball hits a wall, bounce it back
@@ -98,6 +101,23 @@ public class PongLogic {
             ball.setDx(ball.getDx() * -1);
         }
         return updateFromServer;
+    }
+
+    public static void drawScreen(PApplet pApplet, Ball ball, Paddle paddle1, Paddle paddle2, Score score) {
+        //Draw score
+        pApplet.textSize(26);
+        //Add textAscent to make sure the number does not partially fall outside of the screen
+        pApplet.text(score.getPlayer1Score(), Score.xDistance, pApplet.textAscent() + Score.yDistance);
+        pApplet.text(score.getPlayer2Score(), Score.xDistance, Pong.height - Score.yDistance);
+
+        //Draw ball
+        pApplet.fill(255);
+        pApplet.ellipse(ball.getX(), ball.getY(), Ball.size, Ball.size);
+
+        //Draw paddles
+        pApplet.fill(153);
+        pApplet.rect(paddle1.getX(), paddle1.getWallDistance(), paddle1.getPaddleWidth(), paddle1.getPaddleHeight());
+        pApplet.rect(paddle2.getX(), Pong.height - paddle2.getWallDistance(), paddle2.getPaddleWidth(), paddle2.getPaddleHeight());
     }
 
     /**

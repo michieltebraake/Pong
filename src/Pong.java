@@ -21,6 +21,8 @@ public class Pong extends PApplet {
     private Paddle playerPaddle;
     private Paddle opponentPaddle;
 
+    private Score score = new Score();
+
     public static void main(String[] args) {
         PApplet.main(Pong.class);
     }
@@ -90,7 +92,7 @@ public class Pong extends PApplet {
 
         //If the game has started, process a game tick
         if (gameStarted) {
-            int status = PongLogic.processTick(ball, paddle1, paddle2, false, playerId);
+            int status = PongLogic.processTick(ball, paddle1, paddle2, score, false, playerId);
 
             if (status == 1) {
                 //Make a sound that indicates bouncing on a paddle
@@ -103,14 +105,7 @@ public class Pong extends PApplet {
             c.write("[" + tick + "," + +playerPaddle.getX() + "]");
         }
 
-        //Draw ball
-        fill(255);
-        ellipse(ball.getX(), ball.getY(), Ball.size, Ball.size);
-
-        //Draw paddles
-        fill(153);
-        rect(paddle1.getX(), paddle1.getWallDistance(), paddle1.getPaddleWidth(), paddle1.getPaddleHeight());
-        rect(paddle2.getX(), height - paddle2.getWallDistance(), paddle2.getPaddleWidth(), paddle2.getPaddleHeight());
+        PongLogic.drawScreen(this, ball, paddle1, paddle2, score);
     }
 
     public void keyPressed() {

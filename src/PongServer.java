@@ -19,6 +19,7 @@ public class PongServer extends PApplet {
     private Paddle paddle1 = new Paddle(width / 2);
     private Paddle paddle2 = new Paddle(width / 2);
     private Ball ball = new Ball(width / 2, height / 2);
+    private Score score = new Score();
 
     public static void main(String[] args) {
         PApplet.main(PongServer.class);
@@ -80,7 +81,7 @@ public class PongServer extends PApplet {
 
         //If the game has started, process a game tick
         if (gameStarted) {
-            int updateFromServer = PongLogic.processTick(ball, paddle1, paddle2, true, 0);
+            int updateFromServer = PongLogic.processTick(ball, paddle1, paddle2, score, true, 0);
             tick++;
             //If the ball bounced on a paddle or left the screen, send a game update to the clients
             if (updateFromServer != 0) {
@@ -88,13 +89,6 @@ public class PongServer extends PApplet {
             }
         }
 
-        //Draw ball
-        fill(255);
-        ellipse(ball.getX(), ball.getY(), Ball.size, Ball.size);
-
-        //Draw paddles
-        fill(153);
-        rect(paddle1.getX(), paddle1.getWallDistance(), paddle1.getPaddleWidth(), paddle1.getPaddleHeight());
-        rect(paddle2.getX(), height - paddle2.getWallDistance(), paddle2.getPaddleWidth(), paddle2.getPaddleHeight());
+        PongLogic.drawScreen(this, ball, paddle1, paddle2, score);
     }
 }
