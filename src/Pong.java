@@ -83,14 +83,27 @@ public class Pong extends PApplet {
                         }
                     } else {
                         if (commands.length == 2) {
-                            //If just a simple packet with info from other paddle, process that
-                            try {
-                                int tick = Integer.parseInt(commands[0]);
-                            } catch (NumberFormatException e) {
-                                System.out.println("WARNING: Could not read message: " + message);
+                            switch (Integer.parseInt(commands[0])) {
+                                case 5:
+                                    int scoreId = Integer.parseInt(commands[1]);
+                                    if (scoreId == playerId) {
+                                        makeSound(1);
+                                    } else {
+                                        makeSound(2);
+                                    }
+                                    score.addPoint(scoreId);
+                                    break;
+                                default:
+                                    //If just a simple packet with info from other paddle, process that
+                                    try {
+                                        int tick = Integer.parseInt(commands[0]);
+                                    } catch (NumberFormatException e) {
+                                        System.out.println("WARNING: Could not read message: " + message);
+                                    }
+                                    float paddleX = Float.parseFloat(commands[1]);
+                                    opponentPaddle.setX(paddleX);
+                                    break;
                             }
-                            float paddleX = Float.parseFloat(commands[1]);
-                            opponentPaddle.setX(paddleX);
                         } else {
                             //Otherwise it's a packet containing the full game state, process that then
                             if (playerId == 1) {
@@ -114,10 +127,7 @@ public class Pong extends PApplet {
 
             if (status == 1) {
                 //Make a sound that indicates bouncing on a paddle
-                makeSound(1);
-            } else if (status == 2) {
-                //Make a sound that indicates that the ball went off the screen
-                makeSound(2);
+                makeSound(0);
             }
 
             c.write("[" + tick + "," + +playerPaddle.getX() + "]");
@@ -139,7 +149,7 @@ public class Pong extends PApplet {
                     case "R":
                         playerPaddle.setDirection(1);
                         break;
-                    case "NONE":
+                    case "N":
                         playerPaddle.setDirection(0);
                         break;
                 }
@@ -169,10 +179,12 @@ public class Pong extends PApplet {
     /**
      * Sends a signal to the Arduino which will then make a sound with it's speaker
      *
-     * @param pitch Pitch of the sound
+     * @param type Type of the sound (0 = bounce, 1 = score point, 2 = opponent scores point
      */
-    private void makeSound(int pitch) {
-        //TODO Implement this
+    private void makeSound(int type) {
+        if (port != null) {
+            port.write(type);
+        }
     }
 }
 

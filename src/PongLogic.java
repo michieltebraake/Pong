@@ -90,10 +90,10 @@ public class PongLogic {
                 ball.setY(Pong.height / 2);
                 //And randomize a start angle for the ball
                 ball.setDx(new Random().nextInt(2 * Ball.maxDx) - Ball.maxDx);
+                score.addPoint(ball.getDirection() == 1 ? 1 : 2);
             }
             //Indicate that a game update needs to be sent to synchronize the new ball angle
             updateFromServer = (ball.getDirection() == 1) ? 2 : 3;
-            score.addPoint(ball.getDirection() == 1 ? 1 : 2);
         }
 
         //If the ball hits a wall, bounce it back

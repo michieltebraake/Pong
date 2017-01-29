@@ -87,6 +87,12 @@ public class PongServer extends PApplet {
             if (updateFromServer != 0) {
                 s.write("[" + paddle1.getX() + "," + paddle2.getX() + "," + ball.getX() + "," + ball.getY() + "," + ball.getDirection() + "," + ball.getDx() + "," + tick + "]");
             }
+
+            if (updateFromServer == 2) {
+                s.write("[5,1]");
+            } else if (updateFromServer == 3) {
+                s.write("[5,2]");
+            }
         }
 
         PongLogic.drawScreen(this, ball, paddle1, paddle2, score);
