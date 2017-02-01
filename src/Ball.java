@@ -2,7 +2,7 @@ public class Ball {
     //Radius of the ball
     public static float size = 20;
     //Speed (vertical pixels per tick) of the ball
-    public static float speed = 2;
+    public static float speed = 10;
     //Max horizontal movement the ball can get
     public static int maxDx = 5;
 

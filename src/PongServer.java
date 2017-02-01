@@ -2,6 +2,13 @@ import processing.core.PApplet;
 import processing.net.Client;
 import processing.net.Server;
 
+/**
+ * Main pong server class
+ * Handles the connection to the clients
+ * Contains the repeating draw function that updates the game state
+ *
+ * Made by Michiel te Braake and Rick Fontein
+ */
 public class PongServer extends PApplet {
     private int width = 500;
     private int height = 400;

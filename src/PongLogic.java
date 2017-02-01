@@ -2,6 +2,9 @@ import processing.core.PApplet;
 
 import java.util.Random;
 
+/**
+ * Provides some static methods that handle the game logic
+ */
 public class PongLogic {
 
     /**

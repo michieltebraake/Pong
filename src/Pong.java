@@ -2,6 +2,13 @@ import processing.core.PApplet;
 import processing.net.Client;
 import processing.serial.Serial;
 
+/**
+ * Main Pong class
+ * Handles the connection to the server, serial input from the Arduino and the repeating draw function
+ * Calls methods in PongLogic that process the game's logic
+ *
+ * Created by Michiel te Braake and Rick Fontein
+ */
 public class Pong extends PApplet {
     public static int width = 500;
     public static int height = 400;
@@ -187,6 +194,3 @@ public class Pong extends PApplet {
         }
     }
 }
-
-//TODO Make sound on every bounce & point scored
-//TODO Keep score
